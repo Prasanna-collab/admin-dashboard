@@ -1,32 +1,15 @@
-import React, { useEffect, useState} from "react";
-
+import React, { useContext } from "react";
+import { StudentContext } from "../App";
 import { useNavigate } from "react-router-dom";
 
 function AllStudents() {
-
-  useEffect(()=> {
-    getData()
-  }, [])
-
-  const getData = async ()=>{
-   await fetch ("https://63aa73707d7edb3ae628645c.mockapi.io/students")
-   .then (msg=> msg.json())
-    .then (msg => setStud(msg))
-    .catch (err=> console.log(err))
-  }
-
+  let context = useContext(StudentContext);
   let navigate = useNavigate();
-  let [stud, setStud] = useState([]);
 
-  let handleDelete = async(id) => {
-    await fetch(
-      "https://63aa73707d7edb3ae628645c.mockapi.io/students/"+id,{
-        method: "DELETE"})
-        .then(data=> data.json())
-        .then (data=> {getData();})
+  let handleDelete = (e) => {
+    context.stud.splice(context.stud.indexOf(e), 1);
+    context.setStud([...context.stud]);
   };
-
- 
 
   return (
     <div>
@@ -44,10 +27,10 @@ function AllStudents() {
           </tr>
         </thead>
         <tbody>
-          {stud.map((e, i) => {
+          {context.stud.map((e, i) => {
             return (
               <tr key={i}>
-                <th scope="row">{e.id}</th>
+                <th scope="row">{i + 1}</th>
                 <td>{e.name}</td>
                 <td>{e.degree}</td>
                 <td>{e.branch}</td>
@@ -57,13 +40,13 @@ function AllStudents() {
                   <button
                     className="btn btn-primary"
                     onClick={() => {
-                      navigate("/edit-student/" + e.id);
+                      navigate("/edit-student/" + i);
                     }}
                   >
                     Edit
                   </button>
                   &nbsp;&nbsp;&nbsp;
-                  <button className="btn btn-danger" onClick={()=>handleDelete(e.id)}>
+                  <button className="btn btn-danger" onClick={handleDelete}>
                     Delete
                   </button>
                 </td>

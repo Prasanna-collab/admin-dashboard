@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-
+import React, { useState, useContext } from "react";
+import { StudentContext } from "../App";
 import { useNavigate } from "react-router-dom";
 
 function AddStudent() {
+  let context = useContext(StudentContext);
   let navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -11,25 +12,17 @@ function AddStudent() {
   const [branch, setBranch] = useState("");
   const [mobile, setMobile] = useState("");
 
-  const handleSave = async () => {
-    await fetch(
-        "https://63aa73707d7edb3ae628645c.mockapi.io/students",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name,
-            email,
-            degree,
-            branch,
-            mobile,
-          })
-        })
-    
-      navigate("/all-students");
-    };
-    
-  
+  const handleSave = () => {
+    context.stud.push({
+      name,
+      degree,
+      branch,
+      email,
+      mobile,
+    });
+    console.log(context);
+    navigate("/all-students");
+  };
 
   return (
     <div>
