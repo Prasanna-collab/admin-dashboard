@@ -1,15 +1,32 @@
-import React, { useContext } from "react";
-import { StudentContext } from "../App";
+import React, { useEffect, useState} from "react";
+
 import { useNavigate } from "react-router-dom";
 
 function AllStudents() {
-  let context = useContext(StudentContext);
-  let navigate = useNavigate();
 
-  let handleDelete = (e) => {
-    context.stud.splice(context.stud.indexOf(e), 1);
-    context.setStud([...context.stud]);
+  useEffect(()=> {
+    getData()
+  }, [])
+
+  const getData = async ()=>{
+   await fetch ("https://63aa73707d7edb3ae628645c.mockapi.io/students")
+   .then (msg=> msg.json())
+    .then (msg => setStud(msg))
+    .catch (err=> console.log(err))
+  }
+
+  let navigate = useNavigate();
+  let [stud, setStud] = useState([]);
+
+  let handleDelete = async(id) => {
+    await fetch(
+      "https://63aa73707d7edb3ae628645c.mockapi.io/students/"+id,{
+        method: "DELETE"})
+        .then(data=> data.json())
+        .then (data=> {getData();})
   };
+
+ 
 
   return (
     <div>
@@ -27,10 +44,10 @@ function AllStudents() {
           </tr>
         </thead>
         <tbody>
-          {context.stud.map((e, i) => {
+          {stud.map((e, i) => {
             return (
               <tr key={i}>
-                <th scope="row">{i + 1}</th>
+                <th scope="row">{e.id}</th>
                 <td>{e.name}</td>
                 <td>{e.degree}</td>
                 <td>{e.branch}</td>
@@ -40,13 +57,13 @@ function AllStudents() {
                   <button
                     className="btn btn-primary"
                     onClick={() => {
-                      navigate("/edit-student/" + i);
+                      navigate("/edit-student/" + e.id);
                     }}
                   >
                     Edit
                   </button>
                   &nbsp;&nbsp;&nbsp;
-                  <button className="btn btn-danger" onClick={handleDelete}>
+                  <button className="btn btn-danger" onClick={()=>handleDelete(e.id)}>
                     Delete
                   </button>
                 </td>

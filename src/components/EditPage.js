@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import { StudentContext } from "../App";
+import React, { useState, useEffect } from "react";
+
 import { useNavigate, useParams } from "react-router-dom";
 
 function EditPage() {
@@ -11,7 +11,8 @@ function EditPage() {
       getData();
     }
   }, []); //Square Brackets = useEffect Callback. After rendering the getData Function, it allows to reframe the content as we want.
-  let context = useContext(StudentContext);
+  
+  
   let navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -20,29 +21,40 @@ function EditPage() {
   const [branch, setBranch] = useState("");
   const [mobile, setMobile] = useState("");
 
-  const handleSave = () => {
-    context.stud[params.id] = {
-      name,
-      degree,
-      branch,
-      email,
-      mobile,
-    };
+  const handleSave = async () => {
+    await fetch(
+      "https://63aa73707d7edb3ae628645c.mockapi.io/students/"+ params.id,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          degree,
+          branch,
+          mobile,
+        })
+      })
+    
     navigate("/all-students");
-    context.setStud([...context.stud]);
+    
 
   };
 
-  // to update the data of selected object by using context.stud[params.id] to the state variable.
+  // to update the data of selected object by using context.stud[params.id] to the state variable. Without this
+  //the value is not carried to the edit page. But still can be editable.
 
-  let getData = () => {
-    let student = context.stud[params.id];
-    console.log(context.stud[params.id]);
-    setName(student.name);
-    setDegree(student.degree);
-    setBranch(student.branch);
-    setEmail(student.email);
-    setMobile(student.mobile);
+  let getData = async() => {
+    await fetch ("https://63aa73707d7edb3ae628645c.mockapi.io/students/"+ params.id,
+    {method: "GET"})
+    .then(msg=> msg.json())
+    .then(msg=> {
+      setName(msg.name)
+    setEmail(msg.email)
+  setDegree(msg.degree)
+setBranch(msg.branch)
+setMobile(msg.mobile)
+})
   };
 
   return (
